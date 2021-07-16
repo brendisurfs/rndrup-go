@@ -26,9 +26,9 @@ var send = &cobra.Command{
 	Short: "send to rndr",
 	Long:  "send to rndr but longer",
 
-	Run: func(cmd *cobra.Command, args []string) {
-		Send()
-	},
+	// Run: func(cmd *cobra.Command, args []string) {
+	// 	Send()
+	// },
 }
 
 // Execute cmd

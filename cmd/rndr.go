@@ -1,14 +1,14 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/mxschmitt/playwright-go"
 )
 
 // Send func: automates upload RNDR proc.
-func Send() {
+func Send(email, password string) {
 	pw, err := playwright.Run()
 	if err != nil {
 		log.Fatalf("could not launch playwright: %v", err)
@@ -36,27 +36,43 @@ func Send() {
 	}
 
 	// pull out elementsfor input of password
-
-	pageName, err := page.QuerySelector("#session_password")
-	log.Printf("%v", pageName)
+	emailElement, err := page.QuerySelector("#session_email")
+	if err != nil {
+		log.Fatal("error with email")
+	}
+	passwordElement, err := page.QuerySelector("#session_password")
 	if err != nil {
 		log.Fatalf("could not get value: %v", err)
 	}
 
-	fmt.Printf("lot of stuff by: %v", pageName)
-
-	if _, err = page.Screenshot(playwright.PageScreenshotOptions{
-		Path: playwright.String("foo.png"),
-	}); err != nil {
-		log.Fatalf("could not create screenshot: %v", err)
-
-		if err = browser.Close(); err != nil {
-			log.Fatalf("could not close browser: %v", err)
-		}
-
-		if err = pw.Stop(); err != nil {
-			log.Fatalf("could not stop playwright: %v", err)
-
-		}
+	// fill in email and password
+	log.Println("putting in email...")
+	err = emailElement.Fill(email)
+	if err != nil {
+		log.Fatalf("error inputting email")
 	}
+	log.Println("email successful")
+
+	log.Println("putting in password...")
+	err = passwordElement.Fill(password)
+	if err != nil {
+		log.Fatalf("error inputting password")
+	}
+	log.Println("password input successful")
+
+	// click on login
+	submitButton, err := page.QuerySelector("input[name='commit']")
+	if err != nil {
+		log.Fatalf("error clicking submit button")
+	}
+	if err := submitButton.Click(); err != nil {
+		log.Fatalf("could not click")
+	}
+
+	// check if login works
+
+	// file upload: find upload area, upload to rndr.
+	// -- this should spawn on desired number of threads, for multiple processes.
+	// -- option is for varying internet speeds and ram size.
+	time.Sleep(2 * time.Second)
 }
